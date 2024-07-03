@@ -6,7 +6,7 @@ export const registerUser = async (req, res) => {
     try {
         const { username, fullName, password, confirmPassword, email, gender } = req.body
 
-        if ([fullName, username, email, password, confirmPassword, gender].some((field) => field.trim() === "")) {
+        if ([fullName, username,email , password, confirmPassword, gender].some((field) => field.trim() === "")) {
             return res.status(400).json({
                 message: "Please fill all the fields"
             });
@@ -37,7 +37,7 @@ export const registerUser = async (req, res) => {
         })
 
         if (createdUser) {
-            return res.status(200).json({ message: "User created successfully", success: true })
+            return res.status(200).json({ message: "User created successfully", createdUser , success: true })
         }
     } catch (error) {
         console.log("Error while creating user", error)
@@ -74,11 +74,13 @@ export const loginUser = async (req, res) => {
         return res.status(200)
         .cookie('token', token , {maxAge : 1*24*60*60*1000, httpOnly : true, sameSite : 'strict'})
         .json({
+            message : "User logged in successfully",
+            success : true,
             id : user._id,
             username : user.username,
             fullName : user.fullName,
             email : user.email,
-            profilePicture : user.profilePicture
+            profilePicture : user.profilePicture,
         });
 
 
