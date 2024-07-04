@@ -58,7 +58,7 @@ export const getMessage = async(req, res) => {
     } catch (error) {
         console.log("Error while getting message : ",error)
         return res.status(401).json({
-            message :"Message not sent",
+            message :"Can't get messages!",
             success : false
         })
     }

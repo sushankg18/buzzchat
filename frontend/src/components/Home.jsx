@@ -1,21 +1,47 @@
-import { Box, Flex, HStack, Heading, Image, Tooltip, Input, Text } from '@chakra-ui/react'
-import React from 'react'
+import { Box, HStack, Heading, Image, Input, Button, useToast, Text, Flex } from '@chakra-ui/react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import BgImage from '../assets/loginPage.jpg'
 import { IoMdMore } from "react-icons/io";
 import { IoCall } from "react-icons/io5";
 import { FaVideo } from "react-icons/fa";
 import { IoCreateSharp } from "react-icons/io5";
-import { CgMoreVerticalO } from "react-icons/cg";
+import { CgMoreVertical } from "react-icons/cg";
 import { FaSearch } from "react-icons/fa";
 import { MdAttachment } from "react-icons/md";
 import { MdEmojiEmotions } from "react-icons/md";
 import { IoSend } from "react-icons/io5";
 import { BsChatLeftText } from "react-icons/bs";
-
-
-
-import avatar from '../assets/demoAvatarImg.jpg'
+import axios from 'axios';
+import OtherUsers from './OtherUsers.jsx';
+import { useSelector, useDispatch } from 'react-redux'
+import { setSelectedUser } from '../redux/userSlice.js';
+import GetMessages from './GetMessages.jsx';
 const Home = () => {
+  const dispatch = useDispatch()
+  const [showLogoutBtn, setShowLogoutBtn] = useState(false)
+
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { selectedUser } = useSelector(store => store.user)
+  const handleLogout = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/v1/user/logout', { withCredentials: true })
+      navigate('/login')
+      toast({
+        status: 'success',
+        title: res.data.message,
+        duration: 1000,
+        position: 'top'
+      });
+      dispatch(setSelectedUser(null))
+      console.log(res)
+    } catch (error) {
+      console.log("error while logout", error)
+    }
+  }
+
+  GetMessages()
   return (
     <Box minH={'100vh'} display={'flex'} alignItems={'center'} justifyContent={'center'} flexDir={'column'} gap={'2rem'} bgImage={BgImage} color={'white'} fontFamily={'Kanit'} minW={'100vw'} >
       <HStack fontSize={'2.3rem'} gap={'1rem'} color={'lightgreen'}>
@@ -31,10 +57,11 @@ const Home = () => {
               <Heading fontSize={'1.4rem'}>Chats</Heading>
             </Box>
             <HStack fontSize={'1.3rem'} gap={'.8rem'}>
-              <Tooltip label='create group chat'  placement='bottom'>
-                <IoCreateSharp cursor={'pointer'} />
-              </Tooltip>
-              <CgMoreVerticalO cursor={'pointer'} />
+              <IoCreateSharp cursor={'pointer'} />
+              <span style={{ position: "relative" }}>
+                <CgMoreVertical cursor={'pointer'} onClick={() => setShowLogoutBtn(!showLogoutBtn)} />
+                <Button onClick={handleLogout} zIndex={'1'} position={'absolute'} display={showLogoutBtn ? "block" : 'none'} left={'-14'} top={'7'} colorScheme='red'>Logout</Button>
+              </span>
             </HStack>
           </Box>
 
@@ -43,47 +70,7 @@ const Home = () => {
               <FaSearch />
               <Input type='text' variant={'unstyled'} color={'black'} placeholder='Search or start a new chat' />
             </HStack>
-
-
-            <HStack w={'100%'} height={'10%'} px={'.4rem'} cursor={'pointer'}>
-              <Image borderRadius={'50%'} src={avatar} w={'2.2rem'} />
-              <Flex alignItems={'start'} flexDir={'column'} justifyContent={'space-evenly'}>
-                <Text>Sourabh</Text>
-                <Text fontSize={'.8rem'} color={'GrayText'}>Aur kya haal hai ?</Text>
-              </Flex>
-            </HStack>
-
-            <HStack w={'100%'} height={'10%'} px={'.4rem'} cursor={'pointer'}>
-              <Image borderRadius={'50%'} src={avatar} w={'2.2rem'} />
-              <Flex alignItems={'start'} flexDir={'column'} justifyContent={'space-evenly'}>
-                <Text>Sourabh</Text>
-                <Text fontSize={'.8rem'} color={'GrayText'}>Aur kya haal hai ?</Text>
-              </Flex>
-            </HStack>
-
-            <HStack w={'100%'} height={'10%'} px={'.4rem'} cursor={'pointer'}>
-              <Image borderRadius={'50%'} src={avatar} w={'2.2rem'} />
-              <Flex alignItems={'start'} flexDir={'column'} justifyContent={'space-evenly'}>
-                <Text>Sourabh</Text>
-                <Text fontSize={'.8rem'} color={'GrayText'}>Aur kya haal hai ?</Text>
-              </Flex>
-            </HStack>
-
-            <HStack w={'100%'} height={'10%'} px={'.4rem'} cursor={'pointer'}>
-              <Image borderRadius={'50%'} src={avatar} w={'2.2rem'} />
-              <Flex alignItems={'start'} flexDir={'column'} justifyContent={'space-evenly'}>
-                <Text>Sourabh</Text>
-                <Text fontSize={'.8rem'} color={'GrayText'}>Aur kya haal hai ?</Text>
-              </Flex>
-            </HStack>
-
-            <HStack w={'100%'} height={'10%'} px={'.4rem'} cursor={'pointer'} >
-              <Image borderRadius={'50%'} src={avatar} w={'2.2rem'} />
-              <Flex alignItems={'start'} flexDir={'column'} justifyContent={'space-evenly'}>
-                <Text>Sourabh</Text>
-                <Text fontSize={'.8rem'} color={'GrayText'}>Aur kya haal hai ?</Text>
-              </Flex>
-            </HStack>
+            <OtherUsers />
           </Box>
         </Box>
 
@@ -91,33 +78,51 @@ const Home = () => {
         {/* CHAT/MESSAGES AREA */}
 
         <Box width={'70%'} h={'100%'} bgColor={'lavenderblush'} position={'relative'}>
-
-
           <Box bgColor={'lightgreen'} py={'.6rem'} height={'10%'} display={'flex'} justifyContent={'space-between'}>
             <HStack pl={'1rem'} gap={'.5rem'}>
-              <Image src={avatar} w={'2.2rem'} borderRadius={'50%'} />
-              <Heading fontSize={'1.2rem'}>Sourabh</Heading>
+              <Image src={selectedUser?.profilePicture} w={'2.2rem'} borderRadius={'50%'} />
+              <Heading fontSize={'1.2rem'}>{selectedUser?.fullName}</Heading>
             </HStack>
+            {
+              selectedUser && (
 
-            <HStack gap={'1.5rem'} px={'1rem'} fontSize={'1.34rem'} color={'black'}>
-              <FaVideo cursor={'pointer'} />
-              <IoCall cursor={'pointer'} />
-              <IoMdMore cursor={'pointer'} />
-            </HStack>
+                <HStack gap={'1.5rem'} px={'1rem'} fontSize={'1.34rem'} color={'black'}>
+                  <FaVideo cursor={'pointer'} />
+                  <IoCall cursor={'pointer'} />
+                  <IoMdMore cursor={'pointer'} />
+                </HStack>
+              )
+            }
+          </Box>
+          <Box overflowY={'auto'} display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
+            <Flex flexDir={'column'} alignSelf={'flex-start'} gap={'0'} w={'100%'} >
+              <Text bgColor={'white'} w={'fit-content'} padding={'.2rem .7rem'} borderRadius={'.5rem'} >HII KAISE HO SUSHANK BHAII</Text>
+              <Text fontSize={'.7rem'} >12:39</Text>
+            </Flex>
+
+            <Flex flexDir={'column'} gap={'0'} w={'100%'}>
+              <Text bgColor={'lightgreen'} alignSelf={'flex-end'} w={'fit-content'} padding={'.2rem .7rem'} borderRadius={'.5rem'}>MAI BADHIYA BHAII AAP BATAO</Text>
+              <Text fontSize={'.7rem'} alignSelf={'flex-end'}>12:39</Text>
+            </Flex>
           </Box>
 
-
-          <Box position={'absolute'} display={'flex'} alignItems={'center'} p={'.5rem 1rem'} bottom={'0'} w={'100%'} >
-            <HStack w={'15%'} gap={'1rem'} fontSize={'1.3rem'}>
-              <MdEmojiEmotions cursor={'pointer'} />
-              <MdAttachment cursor={'pointer'} />
-            </HStack>
-            <HStack w={'80%'} >
-              <Input variant={'unstyled'} px={'.6rem'} placeholder='Type a message' />
-            </HStack>
-            <HStack w={'5%'} fontSize={'1.2rem'} cursor={'pointer'}>
-              <IoSend />
-            </HStack>
+          <Box position={'absolute'} h={'10%'} display={'flex'} alignItems={'center'} p={'.5rem 1rem'} bottom={'0'} w={'100%'} >
+            {
+              selectedUser && (
+                <>
+                  <HStack w={'15%'} gap={'1rem'} fontSize={'1.3rem'}>
+                    <MdEmojiEmotions cursor={'pointer'} />
+                    <MdAttachment cursor={'pointer'} />
+                  </HStack>
+                  <HStack w={'80%'} >
+                    <Input variant={'unstyled'} px={'.6rem'} placeholder='Type a message' />
+                  </HStack>
+                  <HStack w={'5%'} fontSize={'1.2rem'} cursor={'pointer'}>
+                    <IoSend />
+                  </HStack>
+                </>
+              )
+            }
           </Box>
         </Box>
       </Box>

@@ -13,14 +13,14 @@ export const registerUser = async (req, res) => {
         }
 
         if (password !== confirmPassword) {
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "Password do not match"
             });
         };
 
         const user = await User.findOne({ email })
         if (user) {
-            return res.status(400).json({ message: "User already exist" });
+            return res.status(400).json({ message: "User with this email already exist" });
         };
 
         const hashedPassword = await bcryptjs.hash(password, 10)
@@ -59,10 +59,10 @@ export const loginUser = async (req, res) => {
             return res.status(401).json({ message: "User not found" })
         };
 
-        const isPasswordValid = bcryptjs.compare(password, user.password)
+        const isPasswordValid = await bcryptjs.compare(password, user.password)
 
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "Invalid username or password" })
+            return res.status(402).json({ message: "Invalid username or password" })
         };
 
         const tokenData = {
@@ -78,7 +78,6 @@ export const loginUser = async (req, res) => {
             success : true,
             id : user._id,
             username : user.username,
-            fullName : user.fullName,
             email : user.email,
             profilePicture : user.profilePicture,
         });

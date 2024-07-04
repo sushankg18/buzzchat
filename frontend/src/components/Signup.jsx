@@ -11,11 +11,11 @@ import {
   InputGroup,
   InputLeftElement,
   InputRightElement,
-  Flex,
-  VStack
+  VStack,
+  useToast
 } from '@chakra-ui/react'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link , useNavigate } from 'react-router-dom'
 import { MdEmail } from "react-icons/md";
 import { FaLock, FaLongArrowAltUp } from "react-icons/fa";
 import { FaRegUser } from "react-icons/fa";
@@ -35,28 +35,61 @@ const Signup = () => {
   const [selectedGender, setSelectedGender] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
+  const navigate = useNavigate()
+  const toast = useToast()
   const handleSignup = async (e) => {
     e.preventDefault()
     if ([fullname, username, password, confirmPassword, selectedGender, email].some((fields) => fields.trim() === "")) {
-      alert("Please fill all the fields")
+      toast({
+        position: "top",
+        title: "please fill all the fields",
+        status: 'warning',
+        isClosable: true,
+        duration: 2000
+      });
     } else {
       try {
-        const response = await axios.post('http://localhost:8080/api/v1/user/register', {
+        const response = await axios.post('http://localhost:8000/api/v1/user/register', {
           fullName: fullname,
           email: email,
           username,
           password,
           confirmPassword,
           gender: selectedGender
-        } , {
-          headers : {
-            'Content-Type' : 'application/json',
-          }
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true
         });
-        alert("User Created Successfully")
+        toast({
+          position: "top",
+          title: response.data.message,
+          status: 'success',
+          isClosable: true,
+          duration: 2000
+        });
+        navigate('/login')
         console.log(response)
       } catch (error) {
-        console.log("error occured while registring user : ",error)
+        if(error.response.status === 400){
+          toast({
+            position: "top",
+            title: error.response.data.message,
+            status: 'error',
+            isClosable: true,
+            duration: 2000
+          });
+        } else if(error.response.status === 401){
+            toast({
+              position : "top",
+              status : "warning",
+              title : error.response.data.message,
+              isClosable: true,
+              duration: 2000
+            })
+        }
+        console.log("error occured while registring user : ", error)
       }
     }
   }

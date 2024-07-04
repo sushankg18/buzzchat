@@ -6,52 +6,85 @@ import {
     Input,
     Text,
     HStack,
-    Radio,
-    RadioGroup,
     InputGroup,
     InputLeftElement,
     InputRightElement,
-    Flex,
-    VStack
+    useToast
 } from '@chakra-ui/react'
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { MdEmail } from "react-icons/md";
-import { FaLock, FaLongArrowAltUp } from "react-icons/fa";
-import { FaRegUser } from "react-icons/fa";
-import { MdDriveFileRenameOutline } from "react-icons/md";
+import { FaLock } from "react-icons/fa";
 import { BiSolidHide } from "react-icons/bi";
 import { IoEyeSharp } from "react-icons/io5";
 import { BsChatLeftText } from "react-icons/bs";
 import BgImage from '../assets/loginPage.jpg'
+import { useDispatch } from 'react-redux'
+import { setAuthUser } from '../redux/userSlice'
 const Login = () => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const toast = useToast();
+    const dispatch = useDispatch();
+
+
     const handleLogin = async (e) => {
         e.preventDefault()
         if ([password, email].some((fields) => fields.trim() === "")) {
-            alert("Please fill all the fields")
+            toast({
+                position : "top",
+                status : "warning",
+                title : "Please fill all the fields",
+                duration : 2000,
+                isClosable : true
+            })
         } else {
             try {
-                const response = await axios.post('http://localhost:8080/api/v1/user/login', {
+                const response = await axios.post('http://localhost:8000/api/v1/user/login', {
                     email: email,
-                    password,
+                    password : password,
                 }, {
                     headers: {
                         'Content-Type': 'application/json',
-                    }
+                    },
+                    withCredentials : true
                 });
                 if (response.data.success) {
-                    alert("User Logged in Successfully")
-                    navigate('/')
+                    toast({
+                        position: "top",
+                        title: response.data.message,
+                        status: 'success',
+                        isClosable : true,
+                        duration : 2000
+                    });
                 }
-                console.log(response)
+                navigate('/')
+                console.log(response.data)
+                dispatch(setAuthUser(response.data))
             } catch (error) {
+                if(error.response.status === 401){
+                    toast({
+                        position : "top",
+                        status : "error",
+                        title : error.response.data.message,
+                        isClosable: true,
+                        duration : 2000
+                    })
+                }else if(error.response.status === 402){
+                    toast({
+                        position : "top",
+                        status : "error",
+                        title : error.response.data.message,
+                        isClosable: true,
+                        duration : 2000
+                    })
+                }
+                console.log(error.response.data.message)
                 console.log("error occured while registring user : ", error)
             }
         }
@@ -62,7 +95,6 @@ const Login = () => {
     }
     const handlePassword = (e) => {
         setPassword(e.target.value);
-        console.log("Password: ", e.target.value);
     };
 
     return (
@@ -105,7 +137,7 @@ const Login = () => {
 
                 </Box>
                 <Box w={'100%'} h={'30%'} display={'flex'} py={'.6rem'} alignItems={'center'} justifyContent={'center'}>
-                    <Text>Don't have an account ? <Link to={'/login'} ><span style={{ color: "lightgreen", marginLeft: '.5rem' }}>Sign up</span></Link></Text>
+                    <Text>Don't have an account ? <Link to={'/signup'} ><span style={{ color: "lightgreen", marginLeft: '.5rem' }}>Sign up</span></Link></Text>
                 </Box>
             </Box>
         </Box>

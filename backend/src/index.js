@@ -11,14 +11,15 @@ dotenv.config({path : "./env"})
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin : 'http://localhost:3000'
+    origin : 'http://localhost:3000',
+    credentials : true
 }))
 
 app.use('/api/v1/user',userRouter)
 app.use('/api/v1/message',messaageRouter)
 
 mongoDB_Connection()
-.then(app.listen(process.env.PORT || 3000 , ()=>{
+.then(app.listen(process.env.PORT || 4000 , ()=>{
     console.log("app is listening on port ",process.env.PORT || 3000 )  
 }))
 .catch(
