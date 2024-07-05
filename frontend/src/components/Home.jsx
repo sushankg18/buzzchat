@@ -8,15 +8,14 @@ import { FaVideo } from "react-icons/fa";
 import { IoCreateSharp } from "react-icons/io5";
 import { CgMoreVertical } from "react-icons/cg";
 import { FaSearch } from "react-icons/fa";
-import { MdAttachment } from "react-icons/md";
-import { MdEmojiEmotions } from "react-icons/md";
-import { IoSend } from "react-icons/io5";
 import { BsChatLeftText } from "react-icons/bs";
 import axios from 'axios';
 import OtherUsers from './OtherUsers.jsx';
 import { useSelector, useDispatch } from 'react-redux'
 import { setSelectedUser } from '../redux/userSlice.js';
 import GetMessages from './GetMessages.jsx';
+import Messages from './Messages.jsx';
+import InputMessage from './InputMessage.jsx';
 const Home = () => {
   const dispatch = useDispatch()
   const [showLogoutBtn, setShowLogoutBtn] = useState(false)
@@ -35,7 +34,6 @@ const Home = () => {
         position: 'top'
       });
       dispatch(setSelectedUser(null))
-      console.log(res)
     } catch (error) {
       console.log("error while logout", error)
     }
@@ -94,32 +92,20 @@ const Home = () => {
               )
             }
           </Box>
-          <Box overflowY={'auto'} display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
-            <Flex flexDir={'column'} alignSelf={'flex-start'} gap={'0'} w={'100%'} >
-              <Text bgColor={'white'} w={'fit-content'} padding={'.2rem .7rem'} borderRadius={'.5rem'} >HII KAISE HO SUSHANK BHAII</Text>
-              <Text fontSize={'.7rem'} >12:39</Text>
-            </Flex>
 
-            <Flex flexDir={'column'} gap={'0'} w={'100%'}>
-              <Text bgColor={'lightgreen'} alignSelf={'flex-end'} w={'fit-content'} padding={'.2rem .7rem'} borderRadius={'.5rem'}>MAI BADHIYA BHAII AAP BATAO</Text>
-              <Text fontSize={'.7rem'} alignSelf={'flex-end'}>12:39</Text>
-            </Flex>
+          {/* MESSAGES AREA */}
+
+          <Box overflowY={'auto'} display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
+            {
+              Messages && <Messages /> 
+            }
           </Box>
 
-          <Box position={'absolute'} h={'10%'} display={'flex'} alignItems={'center'} p={'.5rem 1rem'} bottom={'0'} w={'100%'} >
+          <Box position={'absolute'} h={'10%'} display={'flex'} alignItems={'center'}  bottom={'0'} w={'100%'} >
             {
               selectedUser && (
                 <>
-                  <HStack w={'15%'} gap={'1rem'} fontSize={'1.3rem'}>
-                    <MdEmojiEmotions cursor={'pointer'} />
-                    <MdAttachment cursor={'pointer'} />
-                  </HStack>
-                  <HStack w={'80%'} >
-                    <Input variant={'unstyled'} px={'.6rem'} placeholder='Type a message' />
-                  </HStack>
-                  <HStack w={'5%'} fontSize={'1.2rem'} cursor={'pointer'}>
-                    <IoSend />
-                  </HStack>
+                  <InputMessage />
                 </>
               )
             }
