@@ -16,6 +16,7 @@ import { setSelectedUser } from '../redux/userSlice.js';
 import GetMessages from './GetMessages.jsx';
 import Messages from './Messages.jsx';
 import InputMessage from './InputMessage.jsx';
+import EmptyMessageBox from './EmptyMessageBox.jsx';
 const Home = () => {
   const dispatch = useDispatch()
   const [showLogoutBtn, setShowLogoutBtn] = useState(false)
@@ -97,7 +98,7 @@ const Home = () => {
 
           <Box overflowY={'auto'} display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
             {
-              Messages && <Messages /> 
+             selectedUser? Messages && <Messages /> :<EmptyMessageBox /> 
             }
           </Box>
 
