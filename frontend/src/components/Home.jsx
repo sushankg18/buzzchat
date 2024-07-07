@@ -1,7 +1,9 @@
-import { Box, HStack, Heading, Image, Input, Button, useToast, Text, Flex } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import { Box, HStack, Heading, Image, Input, Button, useToast, Text, Flex, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BgImage from '../assets/loginPage.jpg'
+import { FaRegUser } from "react-icons/fa";
+import { FiLogOut } from "react-icons/fi";
 import { IoMdMore } from "react-icons/io";
 import { IoCall } from "react-icons/io5";
 import { FaVideo } from "react-icons/fa";
@@ -17,9 +19,14 @@ import GetMessages from './GetMessages.jsx';
 import Messages from './Messages.jsx';
 import InputMessage from './InputMessage.jsx';
 import EmptyMessageBox from './EmptyMessageBox.jsx';
+import EditProfile from './EditProfile.jsx';
 const Home = () => {
   const dispatch = useDispatch()
   const [showLogoutBtn, setShowLogoutBtn] = useState(false)
+  const [editProfileModal, setEditProfileModal] = useState(false)
+
+  const openModal = () => setEditProfileModal(true);
+  const closeModal = () => setEditProfileModal(false);
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -34,33 +41,42 @@ const Home = () => {
         duration: 1000,
         position: 'top'
       });
-      dispatch(setSelectedUser(null))
+      dispatch(setSelectedUser(null));
+      setShowLogoutBtn(false)
     } catch (error) {
       console.log("error while logout", error)
     }
   }
 
+  const handleEditProfileModal = () => {
+    setEditProfileModal(!editProfileModal)
+    setShowLogoutBtn(false)
+  }
   GetMessages()
   return (
-    <Box minH={'100vh'} display={'flex'} alignItems={'center'} justifyContent={'center'} flexDir={'column'} gap={'2rem'} bgImage={BgImage} color={'white'} fontFamily={'Kanit'} minW={'100vw'} >
-      <HStack fontSize={'2.3rem'} gap={'1rem'} color={'lightgreen'}>
-        <Heading userSelect={'none'}>BUZZ CHAT </Heading>
-        <BsChatLeftText />
-      </HStack>
+    <Box minH={'100vh'} position={'relative'} display={'flex'} alignItems={'center'} justifyContent={'center'} flexDir={'column'} gap={'2rem'} bgImage={BgImage} color={'white'} fontFamily={'Kanit'} minW={'100vw'} >
+      {
+        editProfileModal && <EditProfile isOpen={editProfileModal} onClose={closeModal} />
+      }
+
 
       {/* PEOPLE AREA */}
-      <Box w={'70%'} display={'flex'} color={'black'} height={'80vh'} bgColor={'whitesmoke'}>
-        <Box w={'30%'} h={'100%'} display={'flex'} flexDirection={'column'} >
+      <Box w={'100%'} display={'flex'} color={'black'} height={'100vh'} bgColor={'whitesmoke'}>
+        <Box w={'25%'} h={'100%'} display={'flex'} flexDirection={'column'} >
           <Box h={'10%'} bgColor={'lightblue'} display={'flex'} p={'.6rem 1rem'} justifyContent={'space-between'}>
-            <Box>
-              <Heading fontSize={'1.4rem'}>Chats</Heading>
-            </Box>
+            <HStack color={'black'} gap={'.7rem'}>
+              <Heading fontSize={'1.3rem'} userSelect={'none'}>BUZZ CHAT </Heading>
+              <BsChatLeftText fontSize={'1.1rem'} />
+            </HStack>
             <HStack fontSize={'1.3rem'} gap={'.8rem'}>
               <IoCreateSharp cursor={'pointer'} />
-              <span style={{ position: "relative" }}>
+              <Box position={'relative'}>
                 <CgMoreVertical cursor={'pointer'} onClick={() => setShowLogoutBtn(!showLogoutBtn)} />
-                <Button onClick={handleLogout} zIndex={'1'} position={'absolute'} display={showLogoutBtn ? "block" : 'none'} left={'-14'} top={'7'} colorScheme='red'>Logout</Button>
-              </span>
+                <Box position={'absolute'} zIndex={'2'} left={'0'} top={'7'} bgColor={'white'} display={showLogoutBtn ? 'flex' : 'none'} flexDir={'column'}>
+                  <Button borderRadius={'0'} onClick={handleEditProfileModal} p={'.3rem 1rem'} borderBottom={'2px solid white'} color={'black'} textAlign={'start'} rightIcon={<FaRegUser />} fontSize={'.8rem'} variant={'unstyled'}>Edit profile</Button>
+                  <Button onClick={handleLogout} borderRadius={'0'} p={'.3rem 1rem'} textAlign={'start'} color={'black'} rightIcon={<FiLogOut />} fontSize={'.8rem'} variant={'unstyled'}>Logut</Button>
+                </Box>
+              </Box>
             </HStack>
           </Box>
 
@@ -76,11 +92,14 @@ const Home = () => {
 
         {/* CHAT/MESSAGES AREA */}
 
-        <Box width={'70%'} h={'100%'} bgColor={'lavenderblush'} position={'relative'}>
+        <Box width={'75%'} h={'100%'} bgColor={'lavenderblush'} position={'relative'}>
           <Box bgColor={'lightgreen'} py={'.6rem'} height={'10%'} display={'flex'} justifyContent={'space-between'}>
             <HStack pl={'1rem'} gap={'.5rem'}>
               <Image src={selectedUser?.profilePicture} w={'2.2rem'} borderRadius={'50%'} />
-              <Heading fontSize={'1.2rem'}>{selectedUser?.fullName}</Heading>
+              <Flex flexDir={'column'}>
+                <Heading fontSize={'1.2rem'}>{selectedUser?.fullName}</Heading>
+                <Text fontSize={'.8rem'}>Online</Text>
+              </Flex>
             </HStack>
             {
               selectedUser && (
@@ -98,11 +117,11 @@ const Home = () => {
 
           <Box overflowY={'auto'} display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
             {
-             selectedUser? Messages && <Messages /> :<EmptyMessageBox /> 
+              selectedUser ? Messages && <Messages /> : <EmptyMessageBox />
             }
           </Box>
 
-          <Box position={'absolute'} h={'10%'} display={'flex'} alignItems={'center'}  bottom={'0'} w={'100%'} >
+          <Box position={'absolute'} h={'10%'} display={'flex'} alignItems={'center'} bottom={'0'} w={'100%'} >
             {
               selectedUser && (
                 <>
