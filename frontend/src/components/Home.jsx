@@ -98,7 +98,11 @@ const Home = () => {
               <Image src={selectedUser?.profilePicture} w={'2.2rem'} borderRadius={'50%'} />
               <Flex flexDir={'column'}>
                 <Heading fontSize={'1.2rem'}>{selectedUser?.fullName}</Heading>
-                <Text fontSize={'.8rem'}>Online</Text>
+
+                {
+                  selectedUser &&
+                  <Text fontSize={'.8rem'}>Online</Text>
+                }
               </Flex>
             </HStack>
             {

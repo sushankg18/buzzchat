@@ -8,24 +8,23 @@ import { useSelector } from 'react-redux';
 import io from 'socket.io-client'
 function App() {
 
-  const [socket , setSocket] = useState(null)
+  const [socket, setSocket] = useState(null)
   const { authUser } = useSelector(store => store.user)
-
   useEffect(() => {
-    if (authUser){
-      const socket = io('http://localhost:8000',{
+    if (authUser) {
+      const socket = io('http://localhost:8000', {
         withCredentials: true,
       });
       setSocket(socket)
     };
-  },[authUser])
+  }, [authUser])
 
   return (
     <>
       <ChakraProvider>
         <Router>
           <Routes>
-            <Route path='/' element={<Home />} />
+            <Route path="/" element={<Home />} />
             <Route path='/login' element={<Login />} />
             <Route path='/signup' element={<Signup />} />
           </Routes>
