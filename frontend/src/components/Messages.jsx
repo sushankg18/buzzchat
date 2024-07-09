@@ -15,6 +15,7 @@ const Messages = () => {
   return (
     <>{
       getMessage?.map((message) => {
+        console.log(message)
         const isSender = authUser?.id === message?.senderId
         return (
           <Flex ref={scroll} flexDir={'column'} marginBottom={'.5rem'} w={'100%'} >

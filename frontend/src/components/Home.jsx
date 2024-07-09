@@ -14,12 +14,14 @@ import { BsChatLeftText } from "react-icons/bs";
 import axios from 'axios';
 import OtherUsers from './OtherUsers.jsx';
 import { useSelector, useDispatch } from 'react-redux'
-import { setSelectedUser } from '../redux/userSlice.js';
+import { setAuthUser, setSelectedUser } from '../redux/userSlice.js';
 import GetMessages from './GetMessages.jsx';
 import Messages from './Messages.jsx';
 import InputMessage from './InputMessage.jsx';
 import EmptyMessageBox from './EmptyMessageBox.jsx';
 import EditProfile from './EditProfile.jsx';
+import chatBG from '../assets/chat background image.png'
+
 const Home = () => {
   const dispatch = useDispatch()
   const [showLogoutBtn, setShowLogoutBtn] = useState(false)
@@ -30,7 +32,9 @@ const Home = () => {
 
   const navigate = useNavigate();
   const toast = useToast();
-  const { selectedUser } = useSelector(store => store.user)
+  const { selectedUser , onlineUsers} = useSelector(store => store.user)
+  const isOnline = onlineUsers && onlineUsers.includes(selectedUser?._id)  ;
+
   const handleLogout = async () => {
     try {
       const res = await axios.get('http://localhost:8000/api/v1/user/logout', { withCredentials: true })
@@ -42,6 +46,7 @@ const Home = () => {
         position: 'top'
       });
       dispatch(setSelectedUser(null));
+      dispatch(setAuthUser(null))
       setShowLogoutBtn(false)
     } catch (error) {
       console.log("error while logout", error)
@@ -73,8 +78,8 @@ const Home = () => {
               <Box position={'relative'}>
                 <CgMoreVertical cursor={'pointer'} onClick={() => setShowLogoutBtn(!showLogoutBtn)} />
                 <Box position={'absolute'} zIndex={'2'} left={'0'} top={'7'} bgColor={'white'} display={showLogoutBtn ? 'flex' : 'none'} flexDir={'column'}>
-                  <Button borderRadius={'0'} onClick={handleEditProfileModal} p={'.3rem 1rem'} borderBottom={'2px solid white'} color={'black'} textAlign={'start'} rightIcon={<FaRegUser />} fontSize={'.8rem'} variant={'unstyled'}>Edit profile</Button>
-                  <Button onClick={handleLogout} borderRadius={'0'} p={'.3rem 1rem'} textAlign={'start'} color={'black'} rightIcon={<FiLogOut />} fontSize={'.8rem'} variant={'unstyled'}>Logut</Button>
+                  <Button borderRadius={'0'} onClick={handleEditProfileModal} p={'.3rem 1rem'} borderBottom={'2px solid white'} color={'black'}  textAlign={'start'} rightIcon={<FaRegUser />} fontSize={'1rem'} variant={'ghost'}>Edit profile</Button>
+                  <Button onClick={handleLogout} borderRadius={'0'} p={'.3rem 1rem'} textAlign={'start'} color={'red'} rightIcon={<FiLogOut />} fontSize={'1rem'} variant={'ghost'}>Logut</Button>
                 </Box>
               </Box>
             </HStack>
@@ -100,7 +105,7 @@ const Home = () => {
                 <Heading fontSize={'1.2rem'}>{selectedUser?.fullName}</Heading>
 
                 {
-                  selectedUser &&
+                  (selectedUser && isOnline )&&
                   <Text fontSize={'.8rem'}>Online</Text>
                 }
               </Flex>
@@ -119,7 +124,7 @@ const Home = () => {
 
           {/* MESSAGES AREA */}
 
-          <Box overflowY={'auto'} display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
+          <Box overflowY={'auto'}  display={'flex'} scrollBehavior={'smooth'} flexDir={'column'} alignItems={'start'} w={'100%'} maxH={'80%'} p={'.5rem 1rem'}>
             {
               selectedUser ? Messages && <Messages /> : <EmptyMessageBox />
             }
