@@ -1,5 +1,5 @@
-import { Box, HStack, Heading, Image, Input, Button, useToast, Text, Flex, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import { Box, HStack, Heading, Image, Input, Button, useToast, Text, Flex } from '@chakra-ui/react'
+import React, {  useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BgImage from '../assets/loginPage.jpg'
 import { FaRegUser } from "react-icons/fa";
@@ -20,7 +20,6 @@ import Messages from './Messages.jsx';
 import InputMessage from './InputMessage.jsx';
 import EmptyMessageBox from './EmptyMessageBox.jsx';
 import EditProfile from './EditProfile.jsx';
-import chatBG from '../assets/chat background image.png'
 
 const Home = () => {
   const dispatch = useDispatch()
