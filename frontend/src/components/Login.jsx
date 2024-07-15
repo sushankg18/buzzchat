@@ -99,7 +99,7 @@ const Login = () => {
     return (
         <Box minH={'100vh'} bgImage={BgImage} color={'white'} display={'flex'} alignItems={'center'} justifyContent={'center'} gap={'3rem'} flexDir={'column'} fontFamily={'Kanit'} minW={'100vw'} >
             <HStack fontSize={'2.3rem'} gap={'1rem'} color={'lightgreen'}>
-                <Heading userSelect={'none'}>BUZZ CHAT </Heading>
+                <Heading userSelect={'none'}>BUZZ CHAT</Heading>
                 <BsChatLeftText />
             </HStack>
             <Box minH={'60vh'} w={'30%'} borderRadius={'.8rem'} border={'1px solid dimgray'} overflow={'hidden'} display={'flex'} flexDirection={'column'} gap={'2rem'}  >
