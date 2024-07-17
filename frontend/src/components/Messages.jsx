@@ -23,7 +23,6 @@ const Messages = () => {
               <Text >{message.message && message.message}</Text>
               <Text fontSize={'.6rem'} alignSelf={isSender? 'flex-end' : 'flex-end'}>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </Text>
-              
             </Flex>
           </Flex>
         )
